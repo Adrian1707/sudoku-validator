@@ -32,17 +32,17 @@ class Validator
   end
 
   def validate_rows
-    grid_blocks.map { |section| increment_validity_variables (section) }
+    grid_blocks.map { |section| check_for_validity (section) }
   end
 
   def validate_columns
     @columns = grid_blocks.flatten.each_slice(9).to_a.transpose
-    increment_validity_variables(@columns)
+    check_for_validity(@columns)
   end
 
   def validate_blocks
     @groups = grid_blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
-    increment_validity_variables(@groups)
+    check_for_validity(@groups)
   end
 
   def grid_blocks
@@ -55,7 +55,7 @@ class Validator
     end
   end
 
-  def increment_validity_variables(blocks)
+  def check_for_validity(blocks)
     blocks.map do |block|
       if block_is_invalid?(block)
          @invalid +=1
