@@ -19,9 +19,9 @@ class Validator
     validate_rows
     validate_blocks
     validate_columns
-    if @invalid != 0
-      return INVALID
-    elsif @valid_but_incomplete != 0
+    return INVALID if @invalid != 0
+
+    if @valid_but_incomplete != 0
       return VALID_BUT_INCOMPLETE
     else
       return VALID
@@ -44,7 +44,8 @@ class Validator
   def validate_blocks
     convert_to_blocks
     convert_to_int
-    iterate_and_determine_validity
+    @blocks_collection = @blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
+    increment_validity_variables(@blocks_collection)
   end
 
   def convert_to_blocks
@@ -65,24 +66,29 @@ class Validator
     end
   end
 
-  def increment_validity_variables(blocks)
-    blocks.map do |block|
-      if block_is_valid_but_incomplete?(block)
-        @valid_but_incomplete += 1
-      elsif block_is_invalid?(block)
-        @invalid +=1
-      end
-    end
-  end
-
   def iterate_and_determine_validity
     @blocks.map! do |section|
       increment_validity_variables(section)
     end
   end
 
+  def increment_validity_variables(blocks)
+    blocks.map do |block|
+      if block_is_invalid?(block)
+         @invalid +=1
+      elsif block_is_valid_but_incomplete?(block)
+        @valid_but_incomplete += 1
+      end
+    end
+  end
+
   def block_is_invalid?(block)
-    block.flatten.length != block.flatten.uniq.length || block.flatten.sort != [*1..9] && block.flatten.count(0) < 1
+    if block.flatten.count(0) >= 1
+      no_zeros = block.flatten.reject {|num| num == 0 }
+      no_zeros.flatten.length != no_zeros.flatten.uniq.length
+    else
+    (block.flatten.length != block.flatten.uniq.length || block.flatten.sort != [*1..9])
+    end
   end
 
   def block_is_valid_but_incomplete?(block)
