@@ -10,7 +10,7 @@ describe "End-to-end test" do
       it "returns a string saying so" do
         file = File.read("spec/fixtures/valid_complete.sudoku")
 
-        result = Validator.validate(file)
+        result = Sudoku::Validator.validate(file)
 
         expect(result).to eq "This sudoku is valid."
       end
@@ -20,7 +20,7 @@ describe "End-to-end test" do
       it "returns a string saying so" do
         file = File.read("spec/fixtures/valid_incomplete.sudoku")
 
-        result = Validator.validate(file)
+        result = Sudoku::Validator.validate(file)
 
         expect(result).to eq "This sudoku is valid, but incomplete."
       end
@@ -36,7 +36,7 @@ describe "End-to-end test" do
 
     invalid_fixtures.each do |fixture|
       it "returns a string saying so" do
-        result = Validator.validate(File.read(fixture))
+        result = Sudoku::Validator.validate(File.read(fixture))
 
         expect(result).to(
           eq("This sudoku is invalid."),
