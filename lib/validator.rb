@@ -1,5 +1,6 @@
 require 'pry'
-require './lib/sudoku_parser'
+require './lib/parser'
+require './lib/scanner'
 
 class Validator
 
@@ -18,36 +19,8 @@ class Validator
   end
 
   def validate
-    scan_rows
-    scan_colunms
-    scan_squares
+    Scanner.scan_grid(parsed_blocks, self)
     return_message
-  end
-
-  private
-
-  def return_message
-    return INVALID if @invalid != 0
-    return VALID_BUT_INCOMPLETE if @valid_but_incomplete != 0
-    return VALID
-  end
-
-  def scan_rows
-    parsed_blocks.map { |section| check_for_validity (section) }
-  end
-
-  def scan_colunms
-    @columns = parsed_blocks.flatten.each_slice(9).to_a.transpose
-    check_for_validity(@columns)
-  end
-
-  def scan_squares
-    @squares = parsed_blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
-    check_for_validity(@squares)
-  end
-
-  def parsed_blocks
-    SudokuParser.parse(@puzzle_string)
   end
 
   def check_for_validity(blocks)
@@ -59,6 +32,18 @@ class Validator
         @valid_but_incomplete += 1
       end
     end
+  end
+
+  private
+
+  def return_message
+    return INVALID if @invalid != 0
+    return VALID_BUT_INCOMPLETE if @valid_but_incomplete != 0
+    return VALID
+  end
+
+  def parsed_blocks
+    Parser.parse(@puzzle_string)
   end
 
   def block_is_invalid?(block)

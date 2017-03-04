@@ -1,4 +1,4 @@
-class SudokuParser
+class Parser
 
   ROW_SEPERATOR = "-"
   COLUMN_SEPERATOR = "|"
