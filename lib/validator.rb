@@ -5,6 +5,9 @@ class Validator
   VALID_BUT_INCOMPLETE = "This sudoku is valid, but incomplete."
   VALID = "This sudoku is valid."
 
+  ROW_SEPERATOR = "-"
+  COLUMN_SEPERATOR = "|"
+
   def initialize(puzzle_string)
     @puzzle_string = puzzle_string
     @valid_but_incomplete = 0
@@ -17,8 +20,8 @@ class Validator
 
   def validate
     validate_rows
-    validate_blocks
     validate_columns
+    validate_blocks
     return INVALID if @invalid != 0
 
     if @valid_but_incomplete != 0
@@ -28,39 +31,28 @@ class Validator
     end
   end
 
-  def validate_columns
-    convert_to_blocks
-    convert_to_int
-    @transposed_blocks = @blocks.flatten.each_slice(9).to_a.transpose
-    increment_validity_variables(@transposed_blocks)
-  end
-
   def validate_rows
     convert_to_blocks
-    convert_to_int
     iterate_and_determine_validity
+  end
+
+  def validate_columns
+    convert_to_blocks
+    @columns = @blocks.flatten.each_slice(9).to_a.transpose
+    increment_validity_variables(@columns)
   end
 
   def validate_blocks
     convert_to_blocks
-    convert_to_int
-    @blocks_collection = @blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
-    increment_validity_variables(@blocks_collection)
+    @groups = @blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
+    increment_validity_variables(@groups)
   end
 
   def convert_to_blocks
-    @blocks = @puzzle_string.split("\n").reject {|row| row.include?("--")}.each_slice(3).to_a.map! do |row|
+    @blocks = @puzzle_string.split("\n").reject {|row| row.include?(ROW_SEPERATOR)}.each_slice(3).to_a.map! do |row|
       row.map! do |string|
-        string.split("|")
-      end
-    end
-  end
-
-  def convert_to_int
-    @blocks.map! do |section|
-      section.map! do |block|
-        block.map! do |row|
-          row.split(" ").map(&:to_i)
+        string.split(COLUMN_SEPERATOR).map! do |str|
+          str.split(" ").map(&:to_i)
         end
       end
     end
@@ -87,7 +79,7 @@ class Validator
       no_zeros = block.flatten.reject {|num| num == 0 }
       no_zeros.flatten.length != no_zeros.flatten.uniq.length
     else
-    (block.flatten.length != block.flatten.uniq.length || block.flatten.sort != [*1..9])
+      (block.flatten.length != block.flatten.uniq.length || block.flatten.sort != [*1..9])
     end
   end
 
