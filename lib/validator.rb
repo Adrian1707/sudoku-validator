@@ -20,7 +20,7 @@ class Validator
   def validate
     scan_rows
     scan_colunms
-    scan_blocks
+    scan_squares
     return_message
   end
 
@@ -41,9 +41,9 @@ class Validator
     check_for_validity(@columns)
   end
 
-  def scan_blocks
-    @groups = parsed_blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
-    check_for_validity(@groups)
+  def scan_squares
+    @squares = parsed_blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
+    check_for_validity(@squares)
   end
 
   def parsed_blocks
