@@ -4,7 +4,7 @@ class Scanner
     @blocks = blocks
     @validator = validator
     scan_rows
-    scan_colunms
+    scan_columns
     scan_squares
   end
 
@@ -12,7 +12,7 @@ class Scanner
     @blocks.map { |section| @validator.check_for_validity (section) }
   end
 
-  def self.scan_colunms
+  def self.scan_columns
     @columns = @blocks.flatten.each_slice(9).to_a.transpose
     @validator.check_for_validity(@columns)
   end
