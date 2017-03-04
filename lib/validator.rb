@@ -32,35 +32,26 @@ class Validator
   end
 
   def validate_rows
-    convert_to_blocks
-    iterate_and_determine_validity
+    grid_blocks.map { |section| increment_validity_variables (section) }
   end
 
   def validate_columns
-    convert_to_blocks
-    @columns = @blocks.flatten.each_slice(9).to_a.transpose
+    @columns = grid_blocks.flatten.each_slice(9).to_a.transpose
     increment_validity_variables(@columns)
   end
 
   def validate_blocks
-    convert_to_blocks
-    @groups = @blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
+    @groups = grid_blocks.flatten(1).transpose.flatten(1).each_slice(3).to_a
     increment_validity_variables(@groups)
   end
 
-  def convert_to_blocks
+  def grid_blocks
     @blocks = @puzzle_string.split("\n").reject {|row| row.include?(ROW_SEPERATOR)}.each_slice(3).to_a.map! do |row|
       row.map! do |string|
         string.split(COLUMN_SEPERATOR).map! do |str|
           str.split(" ").map(&:to_i)
         end
       end
-    end
-  end
-
-  def iterate_and_determine_validity
-    @blocks.map! do |section|
-      increment_validity_variables(section)
     end
   end
 
