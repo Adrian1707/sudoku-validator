@@ -5,9 +5,10 @@ class Validator
   VALID_BUT_INCOMPLETE = "This sudoku is valid, but incomplete."
   VALID = "This sudoku is valid."
 
-
   def initialize(puzzle_string)
     @puzzle_string = puzzle_string
+    @valid_but_incomplete = 0
+    @invalid = 0
   end
 
   def self.validate(puzzle_string)
@@ -17,42 +18,33 @@ class Validator
   def validate
     validate_rows
     validate_blocks
-    # validate_columns
+    validate_columns
+    if @invalid != 0
+      return INVALID
+    elsif @valid_but_incomplete != 0
+      return VALID_BUT_INCOMPLETE
+    else
+      return VALID
+    end
   end
 
   def validate_columns
     convert_to_blocks
     convert_to_int
+    @transposed_blocks = @blocks.flatten.each_slice(9).to_a.transpose
+    increment_validity_variables(@transposed_blocks)
   end
 
   def validate_rows
     convert_to_blocks
     convert_to_int
-    @blocks.map! do |section|
-      section.map! do |block|
-        if block_is_valid_but_incomplete?(block)
-          return VALID_BUT_INCOMPLETE
-        elsif block_is_invalid?(block)
-          return INVALID
-        end
-      end
-    end
+    iterate_and_determine_validity
   end
 
   def validate_blocks
     convert_to_blocks
     convert_to_int
-
-    @blocks.map! do |section|
-      section.map! do |block|
-        if block_is_valid_but_incomplete?(block)
-          return VALID_BUT_INCOMPLETE
-        elsif block_is_invalid?(block)
-          return INVALID
-        end
-      end
-    end
-    return VALID
+    iterate_and_determine_validity
   end
 
   def convert_to_blocks
@@ -70,6 +62,22 @@ class Validator
           row.split(" ").map(&:to_i)
         end
       end
+    end
+  end
+
+  def increment_validity_variables(blocks)
+    blocks.map do |block|
+      if block_is_valid_but_incomplete?(block)
+        @valid_but_incomplete += 1
+      elsif block_is_invalid?(block)
+        @invalid +=1
+      end
+    end
+  end
+
+  def iterate_and_determine_validity
+    @blocks.map! do |section|
+      increment_validity_variables(section)
     end
   end
 
